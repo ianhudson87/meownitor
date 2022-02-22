@@ -11,7 +11,8 @@ class App extends Component {
   }
 
   componentDidMount(){
-    fetch("/api") // looks at the "proxy" field in the package.json to know the address/port
+    // get request for data
+    fetch("http://localhost:8080/data/checkthisout")
     .then(res => res.json())
     .then(
         (results) => {

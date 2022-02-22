@@ -1,15 +1,28 @@
+// https://stackabuse.com/building-a-rest-api-with-node-and-express/
 const express = require("express");
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
+
+app.use(cors());
+
+// Configuring body parser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
   
-app.get("/api", (req, res) => {
+app.get("/data/:testvar", (req, res) => {
+    // console.log(req)
+    const testvar = req.params.testvar
+    console.log(testvar)
+
     res.json({
-        message: "Hello from server!",
+        message: "Hello from server!" + testvar,
         data: test_data,
     });
 });
   
-const PORT = process.env.PORT || 8080;
 
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
 
 
