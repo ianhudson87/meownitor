@@ -5,6 +5,7 @@ import React, {Component} from 'react'
 class LineChartTemplate extends Component {
   // Props:
   // data: data to display
+  // data_key: the key of the data to display
 
 	render() {
 		return (
@@ -25,8 +26,8 @@ class LineChartTemplate extends Component {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} isAnimationActive={false}/>
-          <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+          <Line type="monotone" dataKey={this.props.data_key} stroke="#8884d8" activeDot={{ r: 8 }} isAnimationActive={false}/>
+          {/* <Line type="monotone" dataKey="uv" stroke="#82ca9d" /> */}
         </LineChart>
       </ResponsiveContainer>
 		);
