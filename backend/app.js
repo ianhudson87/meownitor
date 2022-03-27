@@ -6,6 +6,8 @@ const http = require('http');
 const app = express();
 const socketIo = require("socket.io");
 
+let steps_goal = 0;
+
 const server = http.createServer(app);
 var io = socketIo(server,{
   cors: {
@@ -38,6 +40,13 @@ updateTimer()
 var awsIot = require('aws-iot-device-sdk');
 const iot_config = require('./config/iot_config.js')
 var device = awsIot.device(iot_config);
+device.to
+
+function steps_goal_reached_notify(){
+  device.publish('steps_goal_sms_topic', `your kitty has reached the steps goal of: ${steps_goal} steps`)
+}
+
+// steps_goal_reached_notify()
 
 device
   .on('connect', function() {
@@ -96,7 +105,7 @@ app.get("/data/test/:testvar", (req, res) => {
 
     res.json({
         message: "Hello from server!" + testvar,
-        data: test_data,
+        // data: test_data,
     });
 });
 
@@ -106,59 +115,77 @@ app.get("/data/steps", (req, res) => {
 
 //////////////////////////////////////
 // SOCKET STUFF
+function sendStepsGoal(socket){
+  socket.emit("send_steps_goal", {
+    "steps_goal": steps_goal
+  })
+}
+
 io.on("connection", (socket) => {
   console.log("New client connected");
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     // clearInterval(interval);
   });
+
+  socket.on("get_steps_goal", () => {
+    console.log("get steps goal")
+    sendStepsGoal(socket)
+  })
+
+  socket.on("change_goal_steps", (data) => {
+    steps_goal = data.goal
+    sendStepsGoal(socket)
+  })
 });
+
+
 
 const PORT = 8080;
 server.listen(PORT, console.log(`Server started on port ${PORT}`));
 
 
-const test_data = [
-    {
-      name: 'Page A',
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: 'Page B',
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: 'Page C',
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: 'Page D',
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: 'Page E',
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: 'Page F',
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: 'Page G',
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-  ];
+// const test_data = [
+//     {
+//       name: 'Page A',
+//       uv: 4000,
+//       pv: 2400,
+//       amt: 2400,
+//     },
+//     {
+//       name: 'Page B',
+//       uv: 3000,
+//       pv: 1398,
+//       amt: 2210,
+//     },
+//     {
+//       name: 'Page C',
+//       uv: 2000,
+//       pv: 9800,
+//       amt: 2290,
+//     },
+//     {
+//       name: 'Page D',
+//       uv: 2780,
+//       pv: 3908,
+//       amt: 2000,
+//     },
+//     {
+//       name: 'Page E',
+//       uv: 1890,
+//       pv: 4800,
+//       amt: 2181,
+//     },
+//     {
+//       name: 'Page F',
+//       uv: 2390,
+//       pv: 3800,
+//       amt: 2500,
+//     },
+//     {
+//       name: 'Page G',
+//       uv: 3490,
+//       pv: 4300,
+//       amt: 2100,
+//     },
+//   ];

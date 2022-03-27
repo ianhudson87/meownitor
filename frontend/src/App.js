@@ -1,8 +1,10 @@
 /* App.js */
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import LineChartTemplate from './Components/LineChartTemplate'
+import VideoPlayer2 from './Components/VideoPlayer2'
 import io from "socket.io-client";
 import { LineChart } from 'recharts';
+// import LiveFeedView from './Components/LiveFeedView';
 
 console.log("node_env:", process.env.NODE_ENV)
 
@@ -20,11 +22,16 @@ class App extends Component {
   constructor(props){
     super(props)
     this.state = {
-      "data": null,
+      // "data": null,
       "steps": null,
       "steps_history": [],
       "isActive": false,
+      "steps_goal": null,
+      "new_steps_goal": 0,
     }
+    this.handleGoalInput = this.handleGoalInput.bind(this)
+    this.handleGoalButton = this.handleGoalButton.bind(this)
+    this.socket = null
   }
 
   addData(){
@@ -76,24 +83,46 @@ class App extends Component {
     )
   }
 
+  handleGoalInput(event) {
+    console.log("here")
+    const value = event.target.value
+    this.setState({
+      "new_steps_goal": value,
+    })
+  }
+
+  handleGoalButton() {
+    this.socket.emit("change_goal_steps", {
+      "goal": this.state.new_steps_goal
+    })
+  }
+
   componentDidMount(){
     // connect to socket
     this.getSteps()
-    const socket = io(ENDPOINT);
+    this.socket = io(ENDPOINT);
 
-    socket.on("connect", () => {
+    this.socket.on("connect", () => {
       console.log("hi, i just connected to sock it")
+      this.socket.emit("get_steps_goal")
     })
 
-    socket.on("became_active", () => {
+    this.socket.on("became_active", () => {
       this.setState({
         "isActive": true
       })
     })
 
-    socket.on("became_not_active", () => {
+    this.socket.on("became_not_active", () => {
       this.setState({
         "isActive": false
+      })
+    })
+
+    this.socket.on("send_steps_goal", (data) => {
+      console.log("got steps_goal")
+      this.setState({
+        "steps_goal": data.steps_goal
       })
     })
 
@@ -104,9 +133,9 @@ class App extends Component {
     .then(res => res.json())
     .then(
         (results) => {
-          this.setState({
-            "data": results.data
-          })
+          // this.setState({
+          //   "data": results.data
+          // })
           console.log(results)
         },
         (error) => {
@@ -121,19 +150,34 @@ class App extends Component {
           Run any function or setState here
       */
     }, 60000);
+
+    const script = document.createElement('script');
+    script.src = "https://unpkg.com/amazon-kinesis-video-streams-webrtc/dist/kvs-webrtc.min.js";
+    script.async = true;
+    document.body.appendChild(script);
   }
 
   
 
 	render() {
+
 		return (
       <div>
-        <LineChartTemplate key={this.state.data} data={this.state.data} data_key={"pv"}/>
+        {/* <LineChartTemplate key={this.state.data} data={this.state.data} data_key={"pv"}/> */}
         <LineChartTemplate key={this.state.steps_history} data={this.state.steps_history} data_key={"steps"}/>
         Your kitty has taken {this.state.steps} steps!
         <div>
         Your kitty is currently {this.state.isActive ? <h1 style={{ color: 'green' }}>active</h1> : <h1 style={{ color: 'red' }}>sleeping or something</h1>}
         </div>
+        <div>
+          <input name="steps_goal" type="number" value={(this.state.new_steps_goal)} onChange={this.handleGoalInput}/>
+          <button onClick={this.handleGoalButton}> Change Goal </button>
+        current steps goal = {this.state.steps_goal}
+        </div>
+          <VideoPlayer2 />
+        <div>
+        </div>
+
       </div>
 		);
 	}
