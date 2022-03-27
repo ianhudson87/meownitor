@@ -4,6 +4,7 @@ import LineChartTemplate from './Components/LineChartTemplate'
 import VideoPlayer2 from './Components/VideoPlayer2'
 import io from "socket.io-client";
 import { LineChart } from 'recharts';
+import 'bootstrap/dist/css/bootstrap.min.css';
 // import LiveFeedView from './Components/LiveFeedView';
 
 console.log("node_env:", process.env.NODE_ENV)
@@ -162,22 +163,28 @@ class App extends Component {
 	render() {
 
 		return (
-      <div>
+      <div class="container">
         {/* <LineChartTemplate key={this.state.data} data={this.state.data} data_key={"pv"}/> */}
-        <LineChartTemplate key={this.state.steps_history} data={this.state.steps_history} data_key={"steps"}/>
-        Your kitty has taken {this.state.steps} steps!
-        <div>
-        Your kitty is currently {this.state.isActive ? <h1 style={{ color: 'green' }}>active</h1> : <h1 style={{ color: 'red' }}>sleeping or something</h1>}
+        <div class="row">
+          <LineChartTemplate key={this.state.steps_history} data={this.state.steps_history} data_key={"steps"}/>
         </div>
-        <div>
-          <input name="steps_goal" type="number" value={(this.state.new_steps_goal)} onChange={this.handleGoalInput}/>
-          <button onClick={this.handleGoalButton}> Change Goal </button>
-        current steps goal = {this.state.steps_goal}
+        <div class="row">
+          {/* <div class="center-block" style="width:400px;"> */}
+          <div class="col-sm">
+            Your kitty has taken {this.state.steps} steps!
+          </div>
+          <div class="col-sm">
+            Your kitty is currently {this.state.isActive ? <h1 style={{ color: 'green' }}>active</h1> : <h1 style={{ color: 'red' }}>sleeping or something</h1>}  
+          </div>
+          <div class="col-sm">
+            <input name="steps_goal" type="number" value={(this.state.new_steps_goal)} onChange={this.handleGoalInput}/>
+            <button onClick={this.handleGoalButton}> Change Goal </button>
+            current steps goal = {this.state.steps_goal}
+          </div>
         </div>
+        <div class="row">
           <VideoPlayer2 />
-        <div>
         </div>
-
       </div>
 		);
 	}
