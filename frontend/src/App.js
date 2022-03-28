@@ -150,7 +150,7 @@ class App extends Component {
       /*
           Run any function or setState here
       */
-    }, 60000);
+    }, 10000);
 
     const script = document.createElement('script');
     script.src = "https://unpkg.com/amazon-kinesis-video-streams-webrtc/dist/kvs-webrtc.min.js";
@@ -161,12 +161,19 @@ class App extends Component {
   
 
 	render() {
+    console.log(this.state.steps_history)
+    let steps_data = this.state.steps_history.map((elt) => {
+      let d = new Date(parseInt(elt.name)*1000)
+      return {"name": `${d.getHours()%12}:${d.getMinutes()}`, "steps": elt.steps}
+    })
+    console.log(steps_data)
+
 
 		return (
       <div class="container">
         {/* <LineChartTemplate key={this.state.data} data={this.state.data} data_key={"pv"}/> */}
         <div class="row">
-          <LineChartTemplate key={this.state.steps_history} data={this.state.steps_history} data_key={"steps"}/>
+          <LineChartTemplate key={this.state.steps_history} data={steps_data.slice(-30)} data_key={"steps"}/>
         </div>
         <div class="row">
           {/* <div class="center-block" style="width:400px;"> */}
@@ -174,7 +181,7 @@ class App extends Component {
             Your kitty has taken {this.state.steps} steps!
           </div>
           <div class="col-sm">
-            Your kitty is currently {this.state.isActive ? <h1 style={{ color: 'green' }}>active</h1> : <h1 style={{ color: 'red' }}>sleeping or something</h1>}  
+            Your kitty is currently {this.state.isActive ? <h1 style={{ color: 'green' }}>active</h1> : <h1 style={{ color: 'red' }}>sleeping or chilling</h1>}  
           </div>
           <div class="col-sm">
             <input name="steps_goal" type="number" value={(this.state.new_steps_goal)} onChange={this.handleGoalInput}/>

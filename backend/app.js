@@ -6,7 +6,8 @@ const http = require('http');
 const app = express();
 const socketIo = require("socket.io");
 
-let steps_goal = 0;
+let steps_goal = 10;
+let steps_goal_reached = false;
 
 const server = http.createServer(app);
 var io = socketIo(server,{
@@ -40,7 +41,6 @@ updateTimer()
 var awsIot = require('aws-iot-device-sdk');
 const iot_config = require('./config/iot_config.js')
 var device = awsIot.device(iot_config);
-device.to
 
 function steps_goal_reached_notify(){
   device.publish('steps_goal_sms_topic', `your kitty has reached the steps goal of: ${steps_goal} steps`)
@@ -50,19 +50,33 @@ function steps_goal_reached_notify(){
 
 device
   .on('connect', function() {
-    console.log('connect');
+    // console.log('connect');
+    device.subscribe('active_topic'); // tells us if cat is active
     device.subscribe('step_topic');
     // device.publish('topic_2', JSON.stringify({ test_data: 1}));
   });
 
 device
   .on('message', function(topic, payload) {
-    if (topic == "step_topic"){
+    if (topic == "active_topic"){
       console.log("I took a step!")
       if(active_timer == 0){
         io.emit("became_active")
       }
       active_timer = ACTIVE_TIMER_CUSHION
+    }
+    else if(topic == "step_topic"){
+      console.log(payload.toString())
+      let payload_json = JSON.parse(payload.toString())
+      let current_steps = payload_json["payload"]
+      if(current_steps < steps_goal && steps_goal_reached == true){
+        steps_goal_reached = false
+      }
+      else if(current_steps >= steps_goal && steps_goal_reached == false) {
+        steps_goal_reached = true
+        steps_goal_reached_notify()
+      }
+      console.log(current_steps)
     }
     // console.log('message', topic, payload.toString());
   });
@@ -136,6 +150,7 @@ io.on("connection", (socket) => {
   socket.on("change_goal_steps", (data) => {
     steps_goal = data.goal
     sendStepsGoal(socket)
+    steps_goal_reached = false
   })
 });
 

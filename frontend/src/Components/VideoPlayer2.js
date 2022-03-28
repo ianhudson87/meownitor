@@ -66,9 +66,9 @@ class VideoPlayer2 extends Component {
             <div>
                 <ReactHlsPlayer
                     src={this.state.streamURL}
-                    autoPlay={false}
+                    autoPlay={true}
                     controls={true}
-                    width="100%"
+                    width="40%"
                     height="auto"
                 />,
             </div>
