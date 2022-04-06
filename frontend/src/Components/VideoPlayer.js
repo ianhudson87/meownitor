@@ -1,32 +1,76 @@
 /* VIdeoPlayer.js */
 import React, {Component} from 'react';
-import { SignalingClient } from 'amazon-kinesis-video-streams-webrtc';
+import AWS from 'aws-sdk'
+import ReactHlsPlayer from 'react-hls-player'
+import stream_options from '../secrets/secrets'
 
-// DescribeSignalingChannel API can also be used to get the ARN from a channel name.
-const channelARN = 'arn:aws:kinesisvideo:us-west-2:123456789012:channel/test-channel/1234567890';
-
-// AWS Credentials
-const accessKeyId = 'ACCESS_KEY_ID_GOES_HERE';
-const secretAccessKey = 'SECRET_ACCESS_KEY_GOES_HERE';
-
-// <video> HTML elements to use to display the local webcam stream and remote stream from the master
-const localView = document.getElementsByTagName('video')[0];
-const remoteView = document.getElementsByTagName('video')[1];
-
-const region = 'us-west-2';
-const clientId = 'RANDOM_VALUE';
-
+const streamName = 'catcam';
+const playbackMode = 'LIVE'    
 
 class VideoPlayer extends Component {
     constructor(props){
         super(props)
+        this.state = {
+            streamURL: ""
+        }
+        this.setStreamURL = this.setStreamURL.bind(this)
+    }
+
+    setStreamURL(){
+        // Step 1: Configure SDK Clients
+        var kinesisVideo = new AWS.KinesisVideo(stream_options);
+        var kinesisVideoArchivedContent = new AWS.KinesisVideoArchivedMedia(stream_options);
+
+        console.log('Fetching data endpoint');
+        kinesisVideo.getDataEndpoint({
+            StreamName: streamName,
+            APIName: "GET_HLS_STREAMING_SESSION_URL"
+            }, (err, response) => {
+                if (err) { return console.error(err); }
+                console.log('Data endpoint: ' + response.DataEndpoint);
+                kinesisVideoArchivedContent.endpoint = new AWS.Endpoint(response.DataEndpoint);
+
+                kinesisVideoArchivedContent.getHLSStreamingSessionURL({
+                    StreamName: streamName,
+                    PlaybackMode: playbackMode,
+                    HLSFragmentSelector: {
+                        FragmentSelectorType: 'SERVER_TIMESTAMP',
+                        TimestampRange: playbackMode === "LIVE" ? undefined : {
+                            StartTimestamp: new Date(),
+                            EndTimestamp: new Date()
+                            }
+                        },
+                        ContainerFormat: 'FRAGMENTED_MP4',
+                        DiscontinuityMode: 'NEVER',
+                        DisplayFragmentTimestamp: 'NEVER',
+                        MaxMediaPlaylistFragmentResults: 5,
+                        Expires: 300
+                    }, (err, response) => {
+                        if (err) { return console.error(err); }
+                        // streamURL = response.HLSStreamingSessionURL
+                        this.setState({streamURL: response.HLSStreamingSessionURL})
+                        console.log('HLS Streaming Session URL: ' + response.HLSStreamingSessionURL);
+                    }
+                )
+            }
+        )
     }
 
     componentDidMount(){
-        
+        this.setStreamURL()
     }
 
     render() {
+        console.log("streamurl", this.state.streamURL)
+        return(
+            <ReactHlsPlayer
+                src={this.state.streamURL}
+                autoPlay={true}
+                controls={true}
+                width="80%"
+                height="auto"
+            />
+        )
 	}
 }
 export default VideoPlayer;
