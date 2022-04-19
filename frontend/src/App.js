@@ -7,6 +7,8 @@ import { LineChart } from 'recharts';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ENDPOINT } from './config'
 import { socket } from './socket'
+import FriendMeter from './Components/FriendMeter'
+import AirQuality from './Components/AirQuality'
 
 class App extends Component {
   constructor(props){
@@ -45,7 +47,8 @@ class App extends Component {
     socket.on("send_steps_goal", (data) => {
       console.log("got steps_goal")
       this.setState({
-        "steps_goal": data.steps_goal
+        "steps_goal": data.steps_goal,
+        "new_steps_goal": data.steps_goal
       })
     })
 
@@ -71,6 +74,12 @@ class App extends Component {
           {/* <div class="center-block" style="width:400px;"> */}
           <div class="col-sm border border-primary rounded m-3 p-2">
             <IsActive />
+          </div>
+          <div class="col-sm border border-secondary rounded m-3 p-2">
+            <FriendMeter />
+          </div>
+          <div class="col-sm border border-secondary rounded m-3 p-2 bg-dark">
+            <AirQuality />
           </div>
           <div class="col-sm border border-warning rounded m-3 p-2">
             <input name="steps_goal" type="number" value={(this.state.new_steps_goal)} onChange={this.handleGoalInput}/>

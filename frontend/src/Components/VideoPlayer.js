@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import AWS from 'aws-sdk'
 import ReactHlsPlayer from 'react-hls-player'
 import stream_options from '../secrets/secrets'
+import {socket} from '../socket'
 
 const streamName = 'catcam';
 const playbackMode = 'LIVE'    
@@ -50,6 +51,9 @@ class VideoPlayer extends Component {
                         // streamURL = response.HLSStreamingSessionURL
                         this.setState({streamURL: response.HLSStreamingSessionURL})
                         console.log('HLS Streaming Session URL: ' + response.HLSStreamingSessionURL);
+                        socket.emit('set_stream_url', {
+                            'url': response.HLSStreamingSessionURL,
+                        })
                     }
                 )
             }
@@ -63,6 +67,7 @@ class VideoPlayer extends Component {
     render() {
         console.log("streamurl", this.state.streamURL)
         return(
+            <div>
             <ReactHlsPlayer
                 src={this.state.streamURL}
                 autoPlay={true}
@@ -70,6 +75,8 @@ class VideoPlayer extends Component {
                 width="80%"
                 height="auto"
             />
+            <img width={640} height={480} src="http://172.27.62.203:8000/stream.mjpg" />
+            </div>
         )
 	}
 }

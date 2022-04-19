@@ -6,8 +6,14 @@ const http = require('http');
 const app = express();
 const socketIo = require("socket.io");
 
-let steps_goal = 10;
+const COLD_TEMP = 15
+let kitty_is_cold = false
+const HUMID_THRESH = 35
+let kitty_is_humid = false
+
+let steps_goal = 100;
 let steps_goal_reached = false;
+let hls_stream_url = null;
 
 const server = http.createServer(app);
 var io = socketIo(server,{
@@ -24,21 +30,33 @@ app.use(bodyParser.json());
 
 let active_timer = 0
 const ACTIVE_TIMER_CUSHION = 5
+let friendship_timer = 0
+const FRIENDSHIP_TIMER_CUSHION = 5
+
 const TIMER_UPDATE_PERIOD = 1
 
-function updateTimer(){
+function updateTimers(){
   if (active_timer > 0 && active_timer - TIMER_UPDATE_PERIOD <= 0) {
     // going from active to not active
     io.emit("became_not_active")
   }
+
+  if (friendship_timer > 0 && friendship_timer - TIMER_UPDATE_PERIOD <= 0) {
+    // going from active to not active
+    console.log("became_not_social")
+    io.emit("became_not_social")
+  }
+
   active_timer = Math.max(0, active_timer - TIMER_UPDATE_PERIOD)
-  setTimeout(updateTimer, TIMER_UPDATE_PERIOD * 1000)
+  friendship_timer = Math.max(0, friendship_timer - TIMER_UPDATE_PERIOD)
+  setTimeout(updateTimers, TIMER_UPDATE_PERIOD * 1000)
 }
 
-updateTimer()
+updateTimers()
 
 ///////////////////// IOT CORE
 var awsIot = require('aws-iot-device-sdk');
+// import {mqtt} from 'aws-iot-device-sdk'
 const iot_config = require('./config/iot_config.js')
 var device = awsIot.device(iot_config);
 
@@ -53,6 +71,7 @@ device
     // console.log('connect');
     device.subscribe('active_topic'); // tells us if cat is active
     device.subscribe('step_topic');
+    device.subscribe('bme_topic')
     // device.publish('topic_2', JSON.stringify({ test_data: 1}));
   });
 
@@ -76,12 +95,66 @@ device
         steps_goal_reached = true
         steps_goal_reached_notify()
       }
+      device.publish('latency_topic', JSON.stringify({
+          "send_time": payload_json["sort"]
+        })
+      )
+
       console.log(current_steps)
     }
-    // console.log('message', topic, payload.toString());
+    else if(topic == "bme_topic"){
+      let payload_json = JSON.parse(payload.toString())
+      io.emit("send_air_quality", {
+          "temp": payload_json.payload.temp,
+          "humidity": payload_json.payload.humidity,
+          "pressure": payload_json.payload.pressure
+      })
+
+      checkIfCold(payload_json)
+      checkIfHumid(payload_json)
+    }
   });
 
 
+function checkIfCold(payload_json){
+  if(payload_json.payload.temp <= COLD_TEMP){
+    if(!kitty_is_cold){
+      // we didn't know kitty is cold
+      kitty_is_cold = true
+      // we know kitty is cold
+      device.publish('steps_goal_sms_topic', `your kitty might be cold. BRRRRRRR. Your kitty is in an area less than ${COLD_TEMP} degrees celsius`)
+    }
+  }
+
+  if(payload_json.payload.temp > COLD_TEMP){
+    if(kitty_is_cold){
+      // kitty was cold
+      kitty_is_cold = false
+      // kitty is not cold anymore
+      device.publish('steps_goal_sms_topic', `your kitty is back to a warmer area`)
+    }
+  }
+}
+
+function checkIfHumid(payload_json){
+  if(payload_json.payload.humidity <= HUMID_THRESH){
+    if(kitty_is_humid){
+      // we didn't know kitty is cold
+      kitty_is_humid = false
+      // we know kitty is cold
+      device.publish('steps_goal_sms_topic', `much humidity no longer`)
+    }
+  }
+
+  if(payload_json.payload.humidity > HUMID_THRESH){
+    if(!kitty_is_humid){
+      // kitty was cold
+      kitty_is_humid = true
+      // kitty is not cold anymore
+      device.publish('steps_goal_sms_topic', `much humidity now`)
+    }
+  }
+}
 ///////////////////// Dynamo
 var AWS = require("aws-sdk");
 const dynamo_config = require('./config/dynamo_config.js');
@@ -127,6 +200,23 @@ app.get("/data/steps", (req, res) => {
   getSteps(req, res)
 });
 
+app.get("/data/hls_url", (req, res) => {
+  res.json({
+    url: hls_stream_url,
+  });
+});
+
+app.post("/data/is_looking_at_friend", (req, res) => {
+  // console.log("here")
+  if(friendship_timer == 0){
+    friendship_timer = FRIENDSHIP_TIMER_CUSHION
+  }
+  io.emit("became_social")
+  res.json({
+    status: "success"
+  })
+})
+
 //////////////////////////////////////
 // SOCKET STUFF
 function sendStepsGoal(socket){
@@ -152,55 +242,18 @@ io.on("connection", (socket) => {
     sendStepsGoal(socket)
     steps_goal_reached = false
   })
+
+  socket.on("set_stream_url", (data) => {
+    console.log("got url")
+    hls_stream_url = data['url']
+  })
+
+  socket.on("latency_test", ()=>{
+    // device.publish('latency_topic', JSON.stringify({"payload": "hi"}))
+  })
 });
 
 
 
 const PORT = 8080;
 server.listen(PORT, console.log(`Server started on port ${PORT}`));
-
-
-// const test_data = [
-//     {
-//       name: 'Page A',
-//       uv: 4000,
-//       pv: 2400,
-//       amt: 2400,
-//     },
-//     {
-//       name: 'Page B',
-//       uv: 3000,
-//       pv: 1398,
-//       amt: 2210,
-//     },
-//     {
-//       name: 'Page C',
-//       uv: 2000,
-//       pv: 9800,
-//       amt: 2290,
-//     },
-//     {
-//       name: 'Page D',
-//       uv: 2780,
-//       pv: 3908,
-//       amt: 2000,
-//     },
-//     {
-//       name: 'Page E',
-//       uv: 1890,
-//       pv: 4800,
-//       amt: 2181,
-//     },
-//     {
-//       name: 'Page F',
-//       uv: 2390,
-//       pv: 3800,
-//       amt: 2500,
-//     },
-//     {
-//       name: 'Page G',
-//       uv: 3490,
-//       pv: 4300,
-//       amt: 2100,
-//     },
-//   ];
