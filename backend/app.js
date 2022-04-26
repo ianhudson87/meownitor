@@ -6,7 +6,7 @@ const http = require('http');
 const app = express();
 const socketIo = require("socket.io");
 
-const COLD_TEMP = 15
+const COLD_TEMP = 20
 let kitty_is_cold = false
 const HUMID_THRESH = 35
 let kitty_is_humid = false
@@ -32,10 +32,19 @@ let active_timer = 0
 const ACTIVE_TIMER_CUSHION = 5
 let friendship_timer = 0
 const FRIENDSHIP_TIMER_CUSHION = 5
+let friendship_meter = 0
 
 const TIMER_UPDATE_PERIOD = 1
 
 function updateTimers(){
+  if(friendship_timer > 0){
+    friendship_meter += 1
+  }
+
+  io.emit("send_friendship_meter", {
+    "friendship_meter": friendship_meter
+  })
+
   if (active_timer > 0 && active_timer - TIMER_UPDATE_PERIOD <= 0) {
     // going from active to not active
     io.emit("became_not_active")
@@ -201,6 +210,7 @@ app.get("/data/steps", (req, res) => {
 });
 
 app.get("/data/hls_url", (req, res) => {
+  console.log("I'M HERE")
   res.json({
     url: hls_stream_url,
   });
@@ -208,9 +218,9 @@ app.get("/data/hls_url", (req, res) => {
 
 app.post("/data/is_looking_at_friend", (req, res) => {
   // console.log("here")
-  if(friendship_timer == 0){
-    friendship_timer = FRIENDSHIP_TIMER_CUSHION
-  }
+  // if(friendship_timer == 0){
+  friendship_timer = FRIENDSHIP_TIMER_CUSHION
+  // }
   io.emit("became_social")
   res.json({
     status: "success"

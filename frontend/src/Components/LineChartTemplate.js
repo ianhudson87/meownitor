@@ -119,6 +119,7 @@ class LineChartTemplate extends Component {
             {/* <Line type="monotone" dataKey="uv" stroke="#82ca9d" /> */}
           </LineChart>
         </ResponsiveContainer>
+        <button onClick={ () => this.getSteps() }>Refresh</button>
         </div>
       </div>
 		);

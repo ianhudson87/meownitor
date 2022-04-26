@@ -10,12 +10,13 @@ class FriendMeter extends Component {
       this.state = {
           'isSocial': false,
           'gif_index': 0,
+          'friendship_meter': 0
       }
     }
 
     randomize_gif(){
         this.setState({
-            'gif_index': Math.floor(Math.random()*num_gifs)
+            'gif_index': Math.floor(Math.random()*num_gifs),
         })
     }
 
@@ -36,6 +37,12 @@ class FriendMeter extends Component {
               "isSocial": false
             })
         })
+
+        socket.on("send_friendship_meter", (data)=>{
+            this.setState({
+                'friendship_meter': data.friendship_meter
+            })
+        })
     }
 
     render(){
@@ -48,6 +55,7 @@ class FriendMeter extends Component {
             <div>
                 <div>
                     Your kitty is currently {text}
+                    Your kitty's friendship points {this.state.friendship_meter} 🐈
                 </div>
                 <div>
                     <img src={image} height={150}/>

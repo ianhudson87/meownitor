@@ -68,14 +68,24 @@ class VideoPlayer extends Component {
         console.log("streamurl", this.state.streamURL)
         return(
             <div>
-            <ReactHlsPlayer
+            {/* <ReactHlsPlayer
                 src={this.state.streamURL}
                 autoPlay={true}
                 controls={true}
                 width="80%"
                 height="auto"
-            />
-            <img width={640} height={480} src="http://172.27.62.203:8000/stream.mjpg" />
+            /> */}
+            <img width={640} height={480} src="http://172.27.62.203:8000/stream.mjpg" style={{
+                transform: 'rotate(180deg)'
+            }}/>
+            {/* <img width={640} height={480} src="https://media.istockphoto.com/photos/cat-world-picture-id1311993425?b=1&k=20&m=1311993425&s=170667a&w=0&h=vFvrS09vrSeKH_u2XZVmjuKeFiIEjTkwr9KQdyOfqvg="
+                style={{
+                    padding: "10px",
+                    backgroundColor: "blue",
+                    transform: 'rotate(90deg)'
+                }}
+            /> */}
+            
             </div>
         )
 	}

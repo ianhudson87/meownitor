@@ -13,7 +13,7 @@ class AirQuality extends Component {
     constructor(props){
       super(props)
       this.state = {
-          'temp': 50,
+          'temp': 0,
           'humidity': 0,
           'pressure': 0,
       }
