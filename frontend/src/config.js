@@ -3,7 +3,7 @@ console.log("node_env:", process.env.NODE_ENV)
 let ENDPOINT
 switch(process.env.NODE_ENV) {
   case 'production':
-    ENDPOINT = 'http://ec2-52-204-45-92.compute-1.amazonaws.com:8080';
+    ENDPOINT = 'http://ec2-54-165-181-188.compute-1.amazonaws.com:8080';
     break;
   case 'development':
   default:
