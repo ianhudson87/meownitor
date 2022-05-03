@@ -12,7 +12,7 @@ This directory contains the files we created in order to gather data from our se
 
 ## How to run
 To run the necessary files, multiple scripts have to be run at the same time. This can be achieved using screen or the & operator at the end of the command, and we chose the second option.  
-**Before you can run these, the aws endpoint needs to be changed in `temp.sh` and `step.sh`. Your key and cert files will not work with the given endpoint**
+**Before you can run these, the aws endpoint needs to be changed in `temp.sh` and `step.sh`. Your key and cert files will not work with the given endpoint**  
 `sh step.sh &> step.out &`  
 `sh temp.sh &> temp.out &`  
 `python3 rpi_cam.py &> vid.out &`  
