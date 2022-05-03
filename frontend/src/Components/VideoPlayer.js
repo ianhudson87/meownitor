@@ -12,7 +12,8 @@ class VideoPlayer extends Component {
     constructor(props){
         super(props)
         this.state = {
-            streamURL: ""
+            streamURL: "",
+            img_id: 0
         }
         this.setStreamURL = this.setStreamURL.bind(this)
     }
@@ -66,6 +67,7 @@ class VideoPlayer extends Component {
 
     render() {
         console.log("streamurl", this.state.streamURL)
+        console.log(this.state.img_id)
         return(
             <div>
             {/* <ReactHlsPlayer
@@ -75,9 +77,10 @@ class VideoPlayer extends Component {
                 width="80%"
                 height="auto"
             /> */}
-            <img width={640} height={480} src="http://172.27.62.203:8000/stream.mjpg" style={{
+            <img id={this.state.img_id} width={640} height={480} src="http://172.27.62.203:8000/stream.mjpg" style={{
                 transform: 'rotate(180deg)'
             }}/>
+            {/* <button onClick={ () => this.setState({img_id: this.state.img_id + 1}) }>Refresh</button> */}
             {/* <img width={640} height={480} src="https://media.istockphoto.com/photos/cat-world-picture-id1311993425?b=1&k=20&m=1311993425&s=170667a&w=0&h=vFvrS09vrSeKH_u2XZVmjuKeFiIEjTkwr9KQdyOfqvg="
                 style={{
                     padding: "10px",

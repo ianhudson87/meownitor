@@ -36,6 +36,7 @@ while(True):
         if datetime.now() >= next_detect:
             print("detect")
             imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            imgGray = cv2.flip(imgGray, 0)
             faces = faceCascade.detectMultiScale(imgGray, 1.3, 5)
             if(len(faces) > 0):
                 print("send api call")

@@ -8,10 +8,10 @@ const socketIo = require("socket.io");
 
 const COLD_TEMP = 20
 let kitty_is_cold = false
-const HUMID_THRESH = 35
+const HUMID_THRESH = 27
 let kitty_is_humid = false
 
-let steps_goal = 100;
+let steps_goal = 40;
 let steps_goal_reached = false;
 let hls_stream_url = null;
 
@@ -112,6 +112,7 @@ device
       console.log(current_steps)
     }
     else if(topic == "bme_topic"){
+      console.log("got bme_topic")
       let payload_json = JSON.parse(payload.toString())
       io.emit("send_air_quality", {
           "temp": payload_json.payload.temp,

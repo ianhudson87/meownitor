@@ -76,19 +76,19 @@ class App extends Component {
             <IsActive />
           </div>
           <div class="col-sm border border-secondary rounded m-3 p-2">
-            <FriendMeter />
-          </div>
-          <div class="col-sm border border-secondary rounded m-3 p-2 bg-dark">
-            <AirQuality />
-          </div>
-        </div>
-        <div class="row border m-5 p-5">
           <div class="col-sm border border-warning rounded m-3 p-2">
             <input name="steps_goal" type="number" value={(this.state.new_steps_goal)} onChange={this.handleGoalInput}/>
             <button onClick={this.handleGoalButton}> Change Goal </button>
             <br/>
             current steps goal = {this.state.steps_goal}
           </div>
+          </div>
+          <div class="col-sm border border-secondary rounded m-3 p-2 bg-dark">
+            <AirQuality />
+          </div>
+        </div>
+        <div class="row border m-5 p-5">
+          <FriendMeter />
         </div>
         <div class="row border m-5 p-5">
           <div style={{backgroundColor: "lightblue"}} class="bg-secondary border-success rounded p-5">
