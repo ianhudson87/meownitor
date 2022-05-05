@@ -23,11 +23,11 @@ local: Run ``npm start`` in the frontend directory
 
 ec2: use express to server the index.html file in the build folder on some port. Then forward port 80 (http) to the port you are serving your file on.
 
-## pi_520
-This directory contains the files we created in order to gather data from our sensors and send it to our website. The folder should be pulled onto the Pi.
-
 ## cat-face-detection
 This directory contains the file for pulling the video stream data and processing it to detect cat faces.
+
+## pi_520
+This directory contains the files we created in order to gather data from our sensors and send it to our website. The folder should be pulled onto the Pi.
 
 Simply pull the folder and run ``python hlsvideostream.py``.
 
