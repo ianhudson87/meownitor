@@ -26,10 +26,10 @@ ec2: use express to server the index.html file in the build folder on some port.
 ## cat-face-detection
 This directory contains the file for pulling the video stream data and processing it to detect cat faces.
 
+Simply pull the folder and run ``python hlsvideostream.py``.
+
 ## pi_520
 This directory contains the files we created in order to gather data from our sensors and send it to our website. The folder should be pulled onto the Pi.
-
-Simply pull the folder and run ``python hlsvideostream.py``.
 
 ### Installation Instructions
 1. Follow the installation instructions from [this link](https://docs.aws.amazon.com/iot/latest/developerguide/connecting-to-existing-device.html) to set up the Raspberry Pi and the necessary permissions from your AWS account.
