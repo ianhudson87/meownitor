@@ -4,7 +4,7 @@
 This directory contains the files for the backend which contains API endpoints, MQTT topic subscription and publishing, socket events. The backend acts as communication between the frontend and the rest of the services and devices.
 
 ### Installation Instructions
-Pull the folder. Navigate to the backend directory. Run npm install.
+Pull the folder. Navigate to the backend directory. Run ``npm install``.
 The necessary keys for accesing IoT and Dynamo should be placed in the following folder: backend/config/
 
 ### How to run
@@ -14,15 +14,22 @@ Run npm start in the backend directory
 This directory containes files for displaying the data to the user.
 
 ### Installation Instructions
-If running locally: pull the folder. Navigate the frontend directory. Run npm install.
-If running on ec2 instance: pull the folder. Navigate the frontend directory. Run npm install. Run npm build. Take the build folder and upload it to the instance.
+If running locally: pull the folder. Navigate the frontend directory. Run ``npm install``.
+
+If running on ec2 instance: pull the folder. Navigate the frontend directory. Run ``npm install``. Run ``npm build``. Take the build folder and upload it to the instance.
 
 ### How to run
-local: Run npm start in the frontend directory
+local: Run ``npm start`` in the frontend directory
+
 ec2: use express to server the index.html file in the build folder on some port. Then forward port 80 (http) to the port you are serving your file on.
 
 ## pi_520
 This directory contains the files we created in order to gather data from our sensors and send it to our website. The folder should be pulled onto the Pi.
+
+## cat-face-detection
+This directory contains the file for pulling the video stream data and processing it to detect cat faces.
+
+Simply pull the folder and run ``python hlsvideostream.py``.
 
 ### Installation Instructions
 1. Follow the installation instructions from [this link](https://docs.aws.amazon.com/iot/latest/developerguide/connecting-to-existing-device.html) to set up the Raspberry Pi and the necessary permissions from your AWS account.
