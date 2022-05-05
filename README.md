@@ -1,4 +1,5 @@
 # meownitor
+frontend: http://ec2-54-159-126-66.compute-1.amazonaws.com/
 
 ## backend
 This directory contains the files for the backend which contains API endpoints, MQTT topic subscription and publishing, socket events. The backend acts as communication between the frontend and the rest of the services and devices.
