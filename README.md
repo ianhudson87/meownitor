@@ -36,7 +36,7 @@ This directory contains the files we created in order to gather data from our se
   * Ensure you know the paths for the key and cert files
 2. Install the necessary python dependencies from requirements.txt using ``pip3 install -r /path/to/requirements.txt``
 3. Connect the camera to the pi camera port
-4. Wire the BME 280 and MMA 2458Q sensors according to the diagram below
+4. Wire the BME 280 and MMA 8452Q sensors according to the diagram below
 ![image](https://user-images.githubusercontent.com/54560896/166551734-72d77cc6-c20f-444b-b33e-dd5c0c0e7dbf.png)
 
 ### How to run
